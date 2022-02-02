@@ -1,0 +1,199 @@
+<Customization level="" description="" product-version="21.206">
+    <Page path="~/Pages/HK/HK301000.aspx" pageSource="nZNfb9owFMWfqdTvYHnilQSmaVKVoK2hBTTYUGGwt8nEd+DhOJnjAN3DPvvuTfgT1laVlifr+vr4nJ9vguYHNhErYCNhVgUuQh694WwscgeWNu6Vxtof71zJvZHK3VzBrpWURc4+Fi6924JxC2WhyELubAGczYVWUjh4gF8F5C7kP4TOsR6l8qA7+PTWb/u+3xJ5tm/FOWdDswarXB5yuuv7sYGzmXJ04qtxtJCla86a3eurADNU9maPGbC5sq4QeiLc+lXjdBwF8PabKDUOE7BhL+QxrtvksyxNtIhhkGoJljazdW/K2UNhBCaagt2iEMo0gmx/M/nWE05M08LGUCpJjGSr1rxqRX+5WlKUWQlpoSQZxZBNfn3FDh8l+SwSQiTiDUZJTcfvdFr90a0FsUkLV2ueWJUI+0jJCOlYKEPrWgf5awSR0HqJclGaJMLIvAyPde+ZDaz+k4dIezVS3RfAdV4GNzrBeMKtb5UsJVa4eMLs7OIItY6NDUCt1tjefudne86mG2Wo78AF51PrdEdDOlASjmNYMRnBFnQZuFFzUlbLW8eQLMFeYK2aCWsQpbpITN6lQu14VS7P3yvQMuT4K9Qfu4MD3T0QPh94XaYPBiz+UXLYO4m9/0+tL8ufEDsasktfHoodc1VYvEsuFTivRi4gtlP1G8qXR05EbKGMTHec3RmB4y6P8z5WpvZcdF2lEDuVmlthD7PqnQq1YSQLz4zhXw==" />
+    <Graph ClassName="GLBreakout" Source="#CDATA" IsNew="True" FileType="NewGraph">
+        <CDATA name="Source"><![CDATA[using System;
+using PX.Data;
+using System.Collections.Generic;
+using System.Collections;
+
+namespace Hackathon2022
+{
+    public class GLBreakout : PXGraph<GLBreakout>
+    {
+        List<string> FirstColumn = new List<string>(new string[] { "A", "B", "A", "C", "D", "B" });
+        List<string> SecondColumn = new List<string>(new string[] { "A", "B", "C", "D" });
+        List<string> ThirdColumn = new List<string>(new string[] { "US", "UK", "CA", "US", "US", "MX" });
+
+        public PXSelect<HKDummyTable> HKMainView;
+
+        public PXSave<HKDummyTable> Save;
+        public PXCancel<HKDummyTable> Cancel;
+
+        public PXAction<HKDummyTable> generateGrid;
+        [PXUIField(DisplayName = "Generate Grid")]
+        [PXButton()]
+        protected IEnumerable GenerateGrid(PXAdapter adapter)
+        {
+            int counter = 50;
+            int colCounter = 0;
+            int rowCounter = 0;
+            List<ObjectHolder> holder = new List<ObjectHolder>();
+            List<string> duplicateCheck = new List<string>();
+
+            foreach (string fc in FirstColumn)
+            {
+                HKDummyTable entry = new HKDummyTable();//(HKDummyTable)DetailsView.Cache.CreateInstance();
+                entry.OriginalText = fc;
+                entry.Value = counter++;
+                entry.GroupName = "First";
+                HKMainView.Insert(entry);
+
+                if (!duplicateCheck.Contains(fc))
+                {
+                    holder.Add(new ObjectHolder { Name = fc, Value = entry.Value, Position = colCounter++ });
+                    duplicateCheck.Add(fc);
+                }
+                else
+                {
+                    holder.Add(new ObjectHolder { Name = fc, Value = entry.Value, Position = duplicateCheck.IndexOf(fc) });
+                }
+                rowCounter++;
+            }
+
+            counter = 150;
+
+            foreach (string sc in SecondColumn)
+            {
+                HKDummyTable entry = new HKDummyTable(); //(HKDummyTable)DetailsView.Cache.CreateInstance();
+                entry.OriginalText = sc;
+                entry.Value = counter++;
+                entry.GroupName = "Second";
+                HKMainView.Insert(entry);
+
+                if (!duplicateCheck.Contains(sc))
+                {
+                    holder.Add(new ObjectHolder { Name = sc, Value = entry.Value, Position = colCounter++ });
+                    duplicateCheck.Add(sc);
+                }
+                else
+                {
+                    holder.Add(new ObjectHolder { Name = sc, Value = entry.Value, Position = duplicateCheck.IndexOf(sc) });
+                }
+                rowCounter++;
+            }
+
+            counter = 501;
+
+            foreach (string tc in ThirdColumn)
+            {
+                HKDummyTable entry = new HKDummyTable(); //(HKDummyTable)DetailsView.Cache.CreateInstance();
+                entry.OriginalText = tc;
+                entry.Value = counter++;
+                entry.GroupName = "Third";
+                HKMainView.Insert(entry);
+
+                if (!duplicateCheck.Contains(tc))
+                {
+                    holder.Add(new ObjectHolder { Name = tc, Value = entry.Value, Position = colCounter++ });
+                    duplicateCheck.Add(tc);
+                }
+                else
+                {
+                    holder.Add(new ObjectHolder { Name = tc, Value = entry.Value, Position = duplicateCheck.IndexOf(tc) });
+                }
+                rowCounter++;
+            }
+
+            decimal?[,] finArray = new decimal?[rowCounter, colCounter + 1];
+            for (int i = 0; i < rowCounter; i++)
+            {
+                ObjectHolder targetObj = holder[i];
+
+                for (int j = 0; j <= colCounter; j++)
+                {
+                    if (j != targetObj.Position)
+                    {
+                        finArray[i, j] = 0;
+                    }
+                    else
+                    {
+                        finArray[i, j] = 1;
+                    }
+                    if (j == colCounter)
+                    {
+                        finArray[i, j] = targetObj.Value;
+                    }
+                }
+            }
+
+            return adapter.Get();
+        }
+
+        public class ObjectHolder
+        {
+            public string Name;
+            public decimal? Value;
+            public int Position;
+        }
+
+    }
+}]]></CDATA>
+    </Graph>
+    <Graph ClassName="HKDummyTable" Source="#CDATA" IsNew="True" FileType="NewDac">
+        <CDATA name="Source"><![CDATA[using System;
+using PX.Data;
+
+namespace Hackathon2022
+{
+	[Serializable]
+	[PXCacheName("HKDummyTable")]
+	public class HKDummyTable : IBqlTable
+	{
+		#region OriginalText
+		[PXDBString(100, IsUnicode = true, InputMask = "", IsKey = true)]
+		[PXUIField(DisplayName = "Value")]
+		public virtual string OriginalText { get; set; }
+		public abstract class originalText : PX.Data.BQL.BqlString.Field<originalText> { }
+		#endregion
+
+		#region Value
+		[PXDBInt(IsKey = true)]
+		[PXUIField(DisplayName = "Generated ID")]
+		public virtual int? Value { get; set; }
+		public abstract class value : PX.Data.BQL.BqlInt.Field<value> { }
+        #endregion
+
+        #region GroupName
+		[PXDBString(100, IsUnicode = true, InputMask = "", IsKey = true)]
+		[PXUIField(DisplayName = "Object Name")]
+		public virtual string GroupName { get; set; }
+		public abstract class groupName : IBqlField { }
+        #endregion
+    }
+}]]></CDATA>
+    </Graph>
+    <File AppRelativePath="Pages\HK\HK301000.aspx" />
+    <File AppRelativePath="Pages\HK\HK301000.aspx.cs" />
+    <SiteMapNode>
+        <data-set>
+            <relations format-version="3" relations-version="20190730" main-table="SiteMap">
+                <link from="MUIScreen (NodeID)" to="SiteMap (NodeID)" />
+                <link from="MUIWorkspace (WorkspaceID)" to="MUIScreen (WorkspaceID)" type="FromMaster" linkname="workspaceToScreen" split-location="yes" updateable="True" />
+                <link from="MUISubcategory (SubcategoryID)" to="MUIScreen (SubcategoryID)" type="FromMaster" updateable="True" />
+                <link from="MUITile (ScreenID)" to="SiteMap (ScreenID)" />
+                <link from="MUIWorkspace (WorkspaceID)" to="MUITile (WorkspaceID)" type="FromMaster" linkname="workspaceToTile" split-location="yes" updateable="True" />
+                <link from="MUIArea (AreaID)" to="MUIWorkspace (AreaID)" type="FromMaster" updateable="True" />
+                <link from="MUIPinnedScreen (NodeID, WorkspaceID)" to="MUIScreen (NodeID, WorkspaceID)" type="WeakIfEmpty" isEmpty="Username" />
+                <link from="MUIFavoriteWorkspace (WorkspaceID)" to="MUIWorkspace (WorkspaceID)" type="WeakIfEmpty" isEmpty="Username" />
+            </relations>
+            <layout>
+                <table name="SiteMap">
+                    <table name="MUIScreen" uplink="(NodeID) = (NodeID)">
+                        <table name="MUIPinnedScreen" uplink="(NodeID, WorkspaceID) = (NodeID, WorkspaceID)" />
+                    </table>
+                    <table name="MUITile" uplink="(ScreenID) = (ScreenID)" />
+                </table>
+                <table name="MUIWorkspace">
+                    <table name="MUIFavoriteWorkspace" uplink="(WorkspaceID) = (WorkspaceID)" />
+                </table>
+                <table name="MUISubcategory" />
+                <table name="MUIArea" />
+            </layout>
+            <data>
+                <SiteMap>
+                    <row Position="21518" Title="GL Breakout" Url="~/Pages/HK/HK301000.aspx" ScreenID="HK301000" NodeID="5cd604d5-c64f-46ad-8a0a-9fc538722661" ParentID="00000000-0000-0000-0000-000000000000" />
+                </SiteMap>
+            </data>
+        </data-set>
+    </SiteMapNode>
+</Customization>
